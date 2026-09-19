@@ -42,6 +42,7 @@
       body {
         margin: 0;
         min-height: 100vh;
+        overflow-x: hidden;
         background:
           linear-gradient(90deg, rgba(138, 43, 39, 0.035) 1px, transparent 1px),
           linear-gradient(0deg, rgba(46, 89, 100, 0.035) 1px, transparent 1px),
@@ -426,6 +427,20 @@
 
       .search-status:empty {
         display: none;
+      }
+
+      #homeView.search-mode .hero,
+      #homeView.search-mode .side-stack,
+      #homeView.search-mode .filters {
+        display: none;
+      }
+
+      #homeView.search-mode .workspace {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      #homeView.search-mode .timeline-panel {
+        min-height: calc(100vh - 170px);
       }
 
       .icon-button,
@@ -1321,8 +1336,8 @@
           <section class="panel timeline-panel">
             <div class="panel-heading">
               <div>
-                <h2>最近记录</h2>
-                <p class="quiet">按时间排列，可以用标签快速筛选。</p>
+                <h2 id="recordsHeading">最近记录</h2>
+                <p class="quiet" id="recordsHint">按时间排列，可以用标签快速筛选。</p>
               </div>
             </div>
 
@@ -1500,6 +1515,8 @@
       const searchInput = document.querySelector("#searchInput");
       const searchClear = document.querySelector("#searchClear");
       const searchStatus = document.querySelector("#searchStatus");
+      const recordsHeading = document.querySelector("#recordsHeading");
+      const recordsHint = document.querySelector("#recordsHint");
       const recordCount = document.querySelector("#recordCount");
       const photoCount = document.querySelector("#photoCount");
       const tagCount = document.querySelector("#tagCount");
@@ -1676,6 +1693,13 @@
       }
 
       function updateSearchStatus(resultCount) {
+        const isSearching = Boolean(activeSearch);
+        views.home.classList.toggle("search-mode", isSearching);
+        recordsHeading.textContent = isSearching ? "搜索结果" : "最近记录";
+        recordsHint.textContent = isSearching
+          ? "正在搜索标题、正文、地点、心情与标签。"
+          : "按时间排列，可以用标签快速筛选。";
+
         if (!activeSearch) {
           searchStatus.textContent = "";
           return;
@@ -1818,13 +1842,12 @@
           });
 
           searchInput.addEventListener("input", () => {
-            const wasEmpty = !activeSearch;
             activeSearch = searchInput.value.trim();
             searchWrap.classList.toggle("has-value", Boolean(activeSearch));
             renderEntries(allRecords);
-            if (wasEmpty && activeSearch) {
+            if (activeSearch) {
               document.querySelector(".timeline-panel").scrollIntoView({
-                behavior: "smooth",
+                behavior: "auto",
                 block: "start",
               });
             }
