@@ -1,0 +1,1202 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cheng+RaccoonIngot - Life Notes</title>
+    <meta
+      name="description"
+      content="A quiet personal journal for daily life, notes, images, places, and small human moments."
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238A2B27'/%3E%3Cpath d='M20 18h24v28H20z' fill='none' stroke='%23fff7f4' stroke-width='4'/%3E%3Cpath d='M26 27h12M26 35h8' stroke='%23fff7f4' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --accent: #8a2b27;
+        --accent-strong: #6f201d;
+        --accent-soft: #f2e5e3;
+        --accent-line: #dbc7c3;
+        --ink: #1e1f23;
+        --muted: #777d8a;
+        --quiet: #a1a7b3;
+        --paper: #fbfaf8;
+        --surface: #ffffff;
+        --surface-soft: #f6f3f1;
+        --line: #e8e2df;
+        --cool: #2e5964;
+        --green: #466f5b;
+        --shadow: 0 24px 70px rgba(42, 31, 29, 0.07);
+        color-scheme: light;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", "Microsoft YaHei", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(90deg, rgba(138, 43, 39, 0.035) 1px, transparent 1px),
+          linear-gradient(0deg, rgba(46, 89, 100, 0.035) 1px, transparent 1px),
+          var(--paper);
+        background-size: 40px 40px;
+        color: var(--ink);
+        letter-spacing: 0;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 34px 28px 24px;
+        border-right: 1px solid var(--line);
+        background: rgba(251, 250, 248, 0.88);
+        backdrop-filter: blur(18px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 54px;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border: 1px solid var(--accent-line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--accent);
+        font-weight: 800;
+        box-shadow: 0 10px 28px rgba(138, 43, 39, 0.12);
+      }
+
+      .brand-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 750;
+      }
+
+      .brand-subtitle {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .nav-group {
+        display: grid;
+        gap: 8px;
+        margin: 0 0 32px;
+        padding: 0 0 26px;
+        border-bottom: 1px solid var(--line);
+        list-style: none;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 42px;
+        padding: 0 12px;
+        border-radius: 8px;
+        color: #303238;
+        font-size: 15px;
+      }
+
+      .nav-item.active {
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        font-weight: 720;
+      }
+
+      .nav-icon {
+        display: grid;
+        width: 24px;
+        height: 24px;
+        place-items: center;
+        color: currentColor;
+      }
+
+      .side-note {
+        position: absolute;
+        right: 28px;
+        bottom: 26px;
+        left: 28px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .main {
+        min-width: 0;
+        padding: 34px clamp(22px, 4vw, 64px) 56px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 28px;
+      }
+
+      .date-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 40px;
+        padding: 0 16px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.76);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .date-chip strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .search-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-input {
+        width: 0;
+        min-width: 0;
+        height: 40px;
+        margin-right: -1px;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: 8px 0 0 8px;
+        background: var(--surface);
+        color: var(--ink);
+        opacity: 0;
+        transition:
+          width 180ms ease,
+          opacity 180ms ease,
+          padding 180ms ease,
+          border-color 180ms ease;
+      }
+
+      .search-wrap.open .search-input {
+        width: min(280px, 42vw);
+        padding: 0 14px;
+        border-color: var(--line);
+        opacity: 1;
+      }
+
+      .icon-button,
+      .primary-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--ink);
+      }
+
+      .icon-button {
+        width: 42px;
+      }
+
+      .primary-button {
+        gap: 8px;
+        padding: 0 16px;
+        background: var(--accent);
+        color: #fffaf8;
+        border-color: var(--accent);
+        font-weight: 700;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+        gap: 18px;
+        align-items: stretch;
+        margin-bottom: 18px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: var(--shadow);
+      }
+
+      .today-panel {
+        display: grid;
+        min-height: 430px;
+        padding: clamp(24px, 4vw, 42px);
+        background:
+          linear-gradient(135deg, rgba(138, 43, 39, 0.1), transparent 38%),
+          linear-gradient(225deg, rgba(46, 89, 100, 0.1), transparent 42%),
+          var(--surface);
+      }
+
+      .eyebrow {
+        margin: 0 0 20px;
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 750;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 760px;
+        margin: 0;
+        font-family: Georgia, "Times New Roman", "Microsoft YaHei", serif;
+        font-size: clamp(38px, 5vw, 72px);
+        font-weight: 560;
+        line-height: 1.04;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 620px;
+        margin: 22px 0 0;
+        color: #555b66;
+        font-size: 17px;
+        line-height: 1.9;
+      }
+
+      .daily-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-self: end;
+        margin-top: 44px;
+      }
+
+      .meta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 34px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.68);
+        color: #4c515b;
+        font-size: 13px;
+      }
+
+      .dashboard {
+        display: grid;
+        gap: 18px;
+      }
+
+      .metric-panel {
+        padding: 26px;
+      }
+
+      .panel-heading {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 24px;
+      }
+
+      .panel-heading h2 {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.25;
+      }
+
+      .quiet {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .pulse-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .pulse-card {
+        min-height: 102px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface-soft);
+      }
+
+      .pulse-card span {
+        display: block;
+        margin-bottom: 14px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .pulse-card strong {
+        display: block;
+        color: var(--accent);
+        font-size: 28px;
+        line-height: 1;
+      }
+
+      .progress {
+        height: 8px;
+        margin: 22px 0 10px;
+        overflow: hidden;
+        border-radius: 99px;
+        background: #ebe7e3;
+      }
+
+      .progress div {
+        width: 67%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--accent), var(--cool));
+      }
+
+      .quote-panel {
+        display: grid;
+        min-height: 150px;
+        padding: 24px 26px;
+        background: #292321;
+        color: #fff9f4;
+      }
+
+      .quote-panel p {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", "Microsoft YaHei", serif;
+        font-size: 22px;
+        line-height: 1.55;
+      }
+
+      .quote-panel span {
+        align-self: end;
+        color: #dfc8c0;
+        font-size: 13px;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .timeline-panel {
+        padding: 30px;
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 28px;
+      }
+
+      .filter {
+        min-height: 38px;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        color: #4c515b;
+        cursor: pointer;
+      }
+
+      .filter.active {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        font-weight: 700;
+      }
+
+      .timeline {
+        position: relative;
+        display: grid;
+        gap: 18px;
+        padding-left: 26px;
+      }
+
+      .timeline::before {
+        position: absolute;
+        top: 6px;
+        bottom: 6px;
+        left: 7px;
+        width: 1px;
+        background: var(--accent-line);
+        content: "";
+      }
+
+      .entry {
+        position: relative;
+        display: grid;
+        gap: 10px;
+        width: 100%;
+        text-align: left;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: inherit;
+        cursor: pointer;
+        transition:
+          border-color 160ms ease,
+          transform 160ms ease,
+          box-shadow 160ms ease;
+      }
+
+      .entry:hover,
+      .entry:focus-visible {
+        border-color: var(--accent-line);
+        box-shadow: 0 14px 38px rgba(42, 31, 29, 0.08);
+        transform: translateY(-1px);
+        outline: none;
+      }
+
+      .entry::before {
+        position: absolute;
+        top: 22px;
+        left: -25px;
+        width: 13px;
+        height: 13px;
+        border: 3px solid var(--paper);
+        border-radius: 50%;
+        background: var(--accent);
+        content: "";
+      }
+
+      .entry-date {
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 750;
+      }
+
+      .entry h3 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.35;
+      }
+
+      .entry p {
+        margin: 0;
+        color: #555b66;
+        font-size: 15px;
+        line-height: 1.8;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tag {
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: var(--surface-soft);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .drawer-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: none;
+        padding: 24px;
+        background: rgba(30, 31, 35, 0.24);
+        backdrop-filter: blur(10px);
+      }
+
+      .drawer-backdrop.open {
+        display: grid;
+        place-items: center;
+      }
+
+      .detail-drawer {
+        width: min(680px, 100%);
+        max-height: min(760px, calc(100vh - 48px));
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(138, 43, 39, 0.08), transparent 34%),
+          var(--surface);
+        box-shadow: 0 32px 90px rgba(25, 18, 16, 0.22);
+      }
+
+      .detail-header {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 26px 28px 0;
+      }
+
+      .detail-header h2 {
+        margin: 8px 0 0;
+        font-family: Georgia, "Times New Roman", "Microsoft YaHei", serif;
+        font-size: clamp(28px, 4vw, 44px);
+        font-weight: 560;
+        line-height: 1.15;
+      }
+
+      .close-button {
+        display: inline-grid;
+        width: 40px;
+        height: 40px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      .detail-body {
+        display: grid;
+        gap: 22px;
+        padding: 24px 28px 30px;
+      }
+
+      .detail-body p {
+        margin: 0;
+        color: #4d525b;
+        font-size: 17px;
+        line-height: 1.9;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .detail-stat {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface-soft);
+      }
+
+      .detail-stat span {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .detail-stat strong {
+        color: var(--ink);
+        font-size: 15px;
+      }
+
+      .side-stack {
+        display: grid;
+        gap: 18px;
+      }
+
+      .now-panel,
+      .guide-panel {
+        padding: 26px;
+      }
+
+      .now-list {
+        display: grid;
+        gap: 16px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .now-list li {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+        color: #4c515b;
+        font-size: 14px;
+      }
+
+      .now-list li:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
+      }
+
+      .now-list strong {
+        color: var(--ink);
+        font-weight: 720;
+      }
+
+      .code-sample {
+        margin: 18px 0 0;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #211d1c;
+        color: #fff7f4;
+      }
+
+      .code-sample pre {
+        margin: 0;
+        padding: 18px;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      @media (max-width: 1100px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: relative;
+          height: auto;
+          padding: 22px;
+        }
+
+        .brand {
+          margin-bottom: 22px;
+        }
+
+        .nav-group {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          padding-bottom: 18px;
+        }
+
+        .side-note {
+          position: static;
+        }
+
+        .hero,
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .main {
+          padding: 22px 14px 40px;
+        }
+
+        .topbar,
+        .actions {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .search-wrap {
+          width: 100%;
+        }
+
+        .search-wrap.open .search-input {
+          width: 100%;
+          border-radius: 8px;
+          margin: 0 0 8px;
+        }
+
+        .date-chip,
+        .primary-button {
+          width: 100%;
+        }
+
+        .icon-button {
+          width: 100%;
+        }
+
+        .nav-group {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .nav-item {
+          font-size: 14px;
+        }
+
+        .today-panel {
+          min-height: 360px;
+          padding: 26px;
+        }
+
+        .pulse-row {
+          grid-template-columns: 1fr;
+        }
+
+        .timeline-panel,
+        .now-panel,
+        .guide-panel,
+        .metric-panel {
+          padding: 20px;
+        }
+
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar" aria-label="站点导航">
+        <div class="brand">
+          <div class="brand-mark">C</div>
+          <div>
+            <p class="brand-title">Cheng+RaccoonIngot</p>
+            <p class="brand-subtitle">Daily Life Archive</p>
+          </div>
+        </div>
+
+        <ul class="nav-group">
+          <li class="nav-item active">
+            <span class="nav-icon">⌂</span>
+            今日
+          </li>
+          <li class="nav-item">
+            <span class="nav-icon">⌁</span>
+            时间线
+          </li>
+          <li class="nav-item">
+            <span class="nav-icon">□</span>
+            相册
+          </li>
+        </ul>
+
+        <ul class="nav-group">
+          <li class="nav-item">
+            <span class="nav-icon">#</span>
+            标签
+          </li>
+          <li class="nav-item">
+            <span class="nav-icon">✎</span>
+            片段
+          </li>
+          <li class="nav-item">
+            <span class="nav-icon">?</span>
+            关于
+          </li>
+        </ul>
+
+        <p class="side-note">
+          记录不是为了把生活整理得完美，而是让一些微小、真实、会发光的东西有地方停留。
+        </p>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="date-chip">
+            <strong>2026.09.19</strong>
+            <span>上海 / 夜间更新</span>
+          </div>
+          <div class="actions">
+            <button class="icon-button" aria-label="切换视图">⌘</button>
+            <div class="search-wrap" id="searchWrap">
+              <input
+                class="search-input"
+                id="searchInput"
+                type="search"
+                placeholder="搜索标题、内容、标签"
+                aria-label="搜索记录"
+              />
+              <button class="icon-button" id="searchToggle" aria-label="搜索记录">⌕</button>
+            </div>
+            <button class="primary-button">＋ 新记录</button>
+          </div>
+        </header>
+
+        <section class="hero" aria-label="今日生活概览">
+          <article class="panel today-panel">
+            <div>
+              <p class="eyebrow">Today / Human Tech Journal</p>
+              <h1>把日常切成清晰的格子，也给情绪留下柔软的边。</h1>
+              <p class="lead">
+                这里可以放今天最重要的一段话：一顿饭、一次散步、一页书、一张照片，或者一个没有被计划但值得保存的瞬间。
+              </p>
+            </div>
+            <div class="daily-meta">
+              <span class="meta-pill">心情 平静</span>
+              <span class="meta-pill">天气 阴</span>
+              <span class="meta-pill">地点 家附近</span>
+              <span class="meta-pill">关键词 晚风 / 阅读 / 整理</span>
+            </div>
+          </article>
+
+          <div class="dashboard">
+            <section class="panel metric-panel" aria-label="生活状态">
+              <div class="panel-heading">
+                <div>
+                  <h2 id="monthTitle">九月记录</h2>
+                  <p class="quiet" id="lastUpdated">最后更新 2026-09-19 22:40</p>
+                </div>
+                <span class="meta-pill">持续中</span>
+              </div>
+              <div class="pulse-row">
+                <div class="pulse-card">
+                  <span>记录</span>
+                  <strong id="recordCount">0</strong>
+                </div>
+                <div class="pulse-card">
+                  <span>照片</span>
+                  <strong id="photoCount">0</strong>
+                </div>
+                <div class="pulse-card">
+                  <span>标签</span>
+                  <strong id="tagCount">0</strong>
+                </div>
+              </div>
+              <div class="progress" aria-label="本月记录进度">
+                <div id="monthProgress"></div>
+              </div>
+              <p class="quiet" id="monthHint">保持轻量更新即可。</p>
+            </section>
+
+            <section class="panel quote-panel" aria-label="今日句子">
+              <p>生活的质感，常常藏在没有被总结的小事里。</p>
+              <span>Note saved at 22:40</span>
+            </section>
+          </div>
+        </section>
+
+        <section class="workspace" aria-label="生活记录工作区">
+          <section class="panel timeline-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>最近记录</h2>
+                <p class="quiet">按时间排列，可以用标签快速筛选。</p>
+              </div>
+            </div>
+
+            <div class="filters" id="filters" aria-label="记录筛选">
+              <button class="filter active" data-filter="all">全部</button>
+            </div>
+
+            <div class="timeline" id="timeline" aria-live="polite"></div>
+          </section>
+
+          <aside class="side-stack">
+            <section class="panel now-panel">
+              <div class="panel-heading">
+                <h2>此刻</h2>
+              </div>
+              <ul class="now-list">
+                <li><span>正在读</span><strong>一本慢书</strong></li>
+                <li><span>常去地点</span><strong>河边小路</strong></li>
+                <li><span>本周颜色</span><strong>#8A2B27</strong></li>
+                <li><span>想保留</span><strong>夜晚的风</strong></li>
+              </ul>
+            </section>
+
+            <section class="panel guide-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>更新格式</h2>
+                  <p class="quiet">后续可以迁移到 Markdown 文件。</p>
+                </div>
+              </div>
+              <div class="code-sample" aria-label="记录格式示例">
+                <pre>{
+  "title": "晚饭后散步",
+  "date": "2026-09-19",
+  "tags": ["日常", "城市"],
+  "mood": "平静",
+  "location": "上海"
+}</pre>
+              </div>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <div class="drawer-backdrop" id="detailBackdrop" aria-hidden="true">
+      <article
+        class="detail-drawer"
+        id="detailDrawer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detailTitle"
+        tabindex="-1"
+      >
+        <header class="detail-header">
+          <div>
+            <p class="eyebrow" id="detailDate">Record</p>
+            <h2 id="detailTitle">记录详情</h2>
+          </div>
+          <button class="close-button" id="detailClose" aria-label="关闭详情">×</button>
+        </header>
+        <div class="detail-body">
+          <p id="detailSummary"></p>
+          <div class="detail-grid">
+            <div class="detail-stat">
+              <span>心情</span>
+              <strong id="detailMood"></strong>
+            </div>
+            <div class="detail-stat">
+              <span>地点</span>
+              <strong id="detailLocation"></strong>
+            </div>
+            <div class="detail-stat">
+              <span>照片</span>
+              <strong id="detailPhotos"></strong>
+            </div>
+          </div>
+          <div class="tags" id="detailTags"></div>
+        </div>
+      </article>
+    </div>
+
+    <script>
+      const timeline = document.querySelector("#timeline");
+      const filterBar = document.querySelector("#filters");
+      const searchWrap = document.querySelector("#searchWrap");
+      const searchToggle = document.querySelector("#searchToggle");
+      const searchInput = document.querySelector("#searchInput");
+      const recordCount = document.querySelector("#recordCount");
+      const photoCount = document.querySelector("#photoCount");
+      const tagCount = document.querySelector("#tagCount");
+      const lastUpdated = document.querySelector("#lastUpdated");
+      const monthTitle = document.querySelector("#monthTitle");
+      const monthProgress = document.querySelector("#monthProgress");
+      const monthHint = document.querySelector("#monthHint");
+      const detailBackdrop = document.querySelector("#detailBackdrop");
+      const detailDrawer = document.querySelector("#detailDrawer");
+      const detailClose = document.querySelector("#detailClose");
+      const detailDate = document.querySelector("#detailDate");
+      const detailTitle = document.querySelector("#detailTitle");
+      const detailSummary = document.querySelector("#detailSummary");
+      const detailMood = document.querySelector("#detailMood");
+      const detailLocation = document.querySelector("#detailLocation");
+      const detailPhotos = document.querySelector("#detailPhotos");
+      const detailTags = document.querySelector("#detailTags");
+      let activeFilter = "all";
+      let activeSearch = "";
+      let allRecords = [];
+
+      const monthNames = [
+        "一月",
+        "二月",
+        "三月",
+        "四月",
+        "五月",
+        "六月",
+        "七月",
+        "八月",
+        "九月",
+        "十月",
+        "十一月",
+        "十二月",
+      ];
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function getVisibleRecords(records) {
+        const visibleRecords = records.filter((record) => {
+          const matchesFilter = activeFilter === "all" || record.tags.includes(activeFilter);
+          const searchText = [
+            record.title,
+            record.summary,
+            record.mood,
+            record.location,
+            ...record.tags,
+          ]
+            .join(" ")
+            .toLowerCase();
+          const matchesSearch = !activeSearch || searchText.includes(activeSearch.toLowerCase());
+          return matchesFilter && matchesSearch;
+        });
+
+        return visibleRecords;
+      }
+
+      function renderEntries(records) {
+        const visibleRecords = getVisibleRecords(records);
+
+        if (!visibleRecords.length) {
+          timeline.innerHTML =
+            '<article class="entry"><span class="entry-date">No records</span><h3>这里还没有记录</h3><p>换一个标签，或者添加一条新的生活片段。</p></article>';
+          return;
+        }
+
+        timeline.innerHTML = visibleRecords
+          .map((record) => {
+            const tags = record.tags
+              .map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`)
+              .join("");
+
+            return `<button class="entry" type="button" data-record-id="${escapeHtml(record.date + record.title)}" data-tags="${escapeHtml(record.tags.join(" "))}">
+              <span class="entry-date">${escapeHtml(record.date)} / ${escapeHtml(record.weekday)}</span>
+              <h3>${escapeHtml(record.title)}</h3>
+              <p>${escapeHtml(record.summary)}</p>
+              <div class="tags">${tags}</div>
+            </button>`;
+          })
+          .join("");
+
+        timeline.querySelectorAll(".entry[data-record-id]").forEach((entry) => {
+          entry.addEventListener("click", () => {
+            const record = records.find((item) => item.date + item.title === entry.dataset.recordId);
+            if (record) {
+              openDetail(record);
+            }
+          });
+        });
+      }
+
+      function openDetail(record) {
+        detailDate.textContent = `${record.date} / ${record.weekday}`;
+        detailTitle.textContent = record.title;
+        detailSummary.textContent = record.summary;
+        detailMood.textContent = record.mood || "未记录";
+        detailLocation.textContent = record.location || "未记录";
+        detailPhotos.textContent = `${Number(record.photos || 0)} 张`;
+        detailTags.innerHTML = record.tags
+          .map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`)
+          .join("");
+        detailBackdrop.classList.add("open");
+        detailBackdrop.setAttribute("aria-hidden", "false");
+        detailDrawer.focus();
+      }
+
+      function closeDetail() {
+        detailBackdrop.classList.remove("open");
+        detailBackdrop.setAttribute("aria-hidden", "true");
+      }
+
+      function updateStats(records) {
+        const allTags = new Set(records.flatMap((record) => record.tags));
+        const photos = records.reduce((sum, record) => sum + Number(record.photos || 0), 0);
+        const latest = records[0];
+        const latestDate = latest ? new Date(`${latest.date}T12:00:00`) : new Date();
+        const month = latestDate.getMonth();
+        const year = latestDate.getFullYear();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysLeft = Math.max(daysInMonth - latestDate.getDate(), 0);
+        const monthRecordTotal = records.filter((record) => {
+          const date = new Date(`${record.date}T12:00:00`);
+          return date.getFullYear() === year && date.getMonth() === month;
+        }).length;
+
+        recordCount.textContent = String(monthRecordTotal);
+        photoCount.textContent = String(photos);
+        tagCount.textContent = String(allTags.size);
+        monthTitle.textContent = `${monthNames[month]}记录`;
+        lastUpdated.textContent = latest ? `最后更新 ${latest.date}` : "等待第一条记录";
+        monthProgress.style.width = `${Math.min((latestDate.getDate() / daysInMonth) * 100, 100)}%`;
+        monthHint.textContent = `本月还有 ${daysLeft} 天，保持轻量更新即可。`;
+      }
+
+      async function loadRecords() {
+        const response = await fetch("./data/records.json", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("records.json load failed");
+        }
+
+        return response.json();
+      }
+
+      loadRecords()
+        .then((records) => {
+          records.sort((a, b) => b.date.localeCompare(a.date));
+          allRecords = records;
+          updateStats(records);
+          renderFilters(records);
+          renderEntries(records);
+
+          searchToggle.addEventListener("click", () => {
+            searchWrap.classList.toggle("open");
+            if (searchWrap.classList.contains("open")) {
+              searchInput.focus();
+            } else {
+              searchInput.value = "";
+              activeSearch = "";
+              renderEntries(allRecords);
+            }
+          });
+
+          searchInput.addEventListener("input", () => {
+            activeSearch = searchInput.value.trim();
+            renderEntries(allRecords);
+          });
+
+          detailClose.addEventListener("click", closeDetail);
+          detailBackdrop.addEventListener("click", (event) => {
+            if (event.target === detailBackdrop) {
+              closeDetail();
+            }
+          });
+
+          document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+              if (detailBackdrop.classList.contains("open")) {
+                closeDetail();
+              } else if (searchWrap.classList.contains("open")) {
+                searchWrap.classList.remove("open");
+                searchInput.value = "";
+                activeSearch = "";
+                renderEntries(allRecords);
+              }
+            }
+          });
+        })
+        .catch(() => {
+          timeline.innerHTML =
+            '<article class="entry"><span class="entry-date">Load error</span><h3>记录暂时没有加载出来</h3><p>请确认 dist/data/records.json 存在，且 JSON 格式有效。</p></article>';
+        });
+    </script>
+  </body>
+</html>
+      function renderFilters(records) {
+        const primaryTags = [...new Set(records.map((record) => record.tags[0]).filter(Boolean))];
+        filterBar.innerHTML = [
+          '<button class="filter active" data-filter="all">全部</button>',
+          ...primaryTags.map((tag) => {
+            return `<button class="filter" data-filter="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`;
+          }),
+        ].join("");
+
+        filterBar.querySelectorAll(".filter").forEach((filter) => {
+          filter.addEventListener("click", () => {
+            activeFilter = filter.dataset.filter;
+            filterBar.querySelectorAll(".filter").forEach((item) => item.classList.remove("active"));
+            filter.classList.add("active");
+            renderEntries(allRecords);
+          });
+        });
+      }

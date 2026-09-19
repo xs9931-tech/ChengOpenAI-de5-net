@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.sites-runtime/
+.wrangler/
+.env
+.env.*
+
+node_modules/
+dist/**/*.map
