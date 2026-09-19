@@ -459,6 +459,97 @@
         align-items: start;
       }
 
+      .view {
+        display: none;
+      }
+
+      .view.active {
+        display: block;
+      }
+
+      .album-view {
+        position: relative;
+        min-height: 680px;
+        overflow: hidden;
+        padding: clamp(24px, 4vw, 46px);
+      }
+
+      .album-view::before {
+        position: absolute;
+        right: -20px;
+        bottom: -96px;
+        z-index: 0;
+        color: rgba(138, 43, 39, 0.08);
+        content: "🦝";
+        font-size: clamp(220px, 34vw, 520px);
+        line-height: 1;
+        transform: rotate(-8deg);
+        pointer-events: none;
+      }
+
+      .album-head,
+      .album-grid {
+        position: relative;
+        z-index: 1;
+      }
+
+      .album-head {
+        max-width: 760px;
+        margin-bottom: 34px;
+      }
+
+      .album-head h2 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", "Microsoft YaHei", serif;
+        font-size: clamp(42px, 7vw, 92px);
+        font-weight: 560;
+        line-height: 1.05;
+      }
+
+      .album-head p {
+        max-width: 620px;
+        margin: 18px 0 0;
+        color: #565c66;
+        font-size: 17px;
+        line-height: 1.85;
+      }
+
+      .album-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .photo-card {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: var(--shadow);
+      }
+
+      .photo-card img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+      }
+
+      .photo-caption {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 16px 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .photo-caption strong {
+        color: var(--ink);
+        font-size: 16px;
+      }
+
       .timeline-panel {
         padding: 30px;
       }
@@ -840,6 +931,14 @@
           padding: 20px;
         }
 
+        .album-view {
+          padding: 24px 18px;
+        }
+
+        .album-grid {
+          grid-template-columns: 1fr;
+        }
+
         .detail-grid {
           grid-template-columns: 1fr;
         }
@@ -866,7 +965,7 @@
 
         <ul class="nav-group">
           <li>
-            <button class="nav-item active" type="button" data-coming-soon>
+            <button class="nav-item active" type="button" data-view-target="home">
             <span class="nav-icon">⌂</span>
             今日
             </button>
@@ -878,7 +977,7 @@
             </button>
           </li>
           <li>
-            <button class="nav-item" type="button" data-coming-soon>
+            <button class="nav-item" type="button" data-view-target="album">
             <span class="nav-icon">□</span>
             相册
             </button>
@@ -934,60 +1033,61 @@
           </div>
         </header>
 
-        <section class="hero" aria-label="今日生活概览">
-          <article class="panel today-panel">
-            <div>
-              <p class="eyebrow">Today / Human Tech Journal</p>
-              <h1>请务必在大雪滂沱的圆月里，陪我燃起篝柴，影影绰绰地照亮，只属于我们的城寨。</h1>
-              <p class="lead">
-                这里可以放浣熊元宝的：新熊文名词（如：奥拓姆屁眼，比尔费诗），浣熊照片，浣熊守则，或者一个未曾记录但值得恋眷的瞬间。
-              </p>
+        <div class="view active" id="homeView">
+          <section class="hero" aria-label="今日生活概览">
+            <article class="panel today-panel">
+              <div>
+                <p class="eyebrow">Today / Human Tech Journal</p>
+                <h1>请务必在大雪滂沱的圆月里，陪我燃起篝柴，影影绰绰地照亮，只属于我们的城寨。</h1>
+                <p class="lead">
+                  这里可以放浣熊元宝的：新熊文名词（如：奥拓姆屁眼，比尔费诗），浣熊照片，浣熊守则，或者一个未曾记录但值得恋眷的瞬间。
+                </p>
+              </div>
+              <div class="daily-meta">
+                <span class="meta-pill">心情 平静</span>
+                <span class="meta-pill">天气 阴</span>
+                <span class="meta-pill">地点 家附近</span>
+                <span class="meta-pill">关键词 晚风 / 阅读 / 整理</span>
+              </div>
+            </article>
+
+            <div class="dashboard">
+              <section class="panel metric-panel" aria-label="生活状态">
+                <div class="panel-heading">
+                  <div>
+                    <h2 id="monthTitle">九月记录</h2>
+                    <p class="quiet" id="lastUpdated">最后更新 2026-09-19 22:40</p>
+                  </div>
+                  <span class="meta-pill">持续中</span>
+                </div>
+                <div class="pulse-row">
+                  <div class="pulse-card">
+                    <span>记录</span>
+                    <strong id="recordCount">0</strong>
+                  </div>
+                  <div class="pulse-card">
+                    <span>照片</span>
+                    <strong id="photoCount">0</strong>
+                  </div>
+                  <div class="pulse-card">
+                    <span>标签</span>
+                    <strong id="tagCount">0</strong>
+                  </div>
+                </div>
+                <div class="progress" aria-label="本月记录进度">
+                  <div id="monthProgress"></div>
+                </div>
+                <p class="quiet" id="monthHint">保持轻量更新即可。</p>
+              </section>
+
+              <section class="panel quote-panel" aria-label="今日句子">
+                <p>海熊在干活，虾熊在站岗，克劳德熊在睡觉，狈熊在耍熊砖头</p>
+                <span>Note saved for the bears</span>
+              </section>
             </div>
-            <div class="daily-meta">
-              <span class="meta-pill">心情 平静</span>
-              <span class="meta-pill">天气 阴</span>
-              <span class="meta-pill">地点 家附近</span>
-              <span class="meta-pill">关键词 晚风 / 阅读 / 整理</span>
-            </div>
-          </article>
+          </section>
 
-          <div class="dashboard">
-            <section class="panel metric-panel" aria-label="生活状态">
-              <div class="panel-heading">
-                <div>
-                  <h2 id="monthTitle">九月记录</h2>
-                  <p class="quiet" id="lastUpdated">最后更新 2026-09-19 22:40</p>
-                </div>
-                <span class="meta-pill">持续中</span>
-              </div>
-              <div class="pulse-row">
-                <div class="pulse-card">
-                  <span>记录</span>
-                  <strong id="recordCount">0</strong>
-                </div>
-                <div class="pulse-card">
-                  <span>照片</span>
-                  <strong id="photoCount">0</strong>
-                </div>
-                <div class="pulse-card">
-                  <span>标签</span>
-                  <strong id="tagCount">0</strong>
-                </div>
-              </div>
-              <div class="progress" aria-label="本月记录进度">
-                <div id="monthProgress"></div>
-              </div>
-              <p class="quiet" id="monthHint">保持轻量更新即可。</p>
-            </section>
-
-            <section class="panel quote-panel" aria-label="今日句子">
-              <p>海熊在干活，虾熊在站岗，克劳德熊在睡觉，狈熊在耍熊砖头</p>
-              <span>Note saved for the bears</span>
-            </section>
-          </div>
-        </section>
-
-        <section class="workspace" aria-label="生活记录工作区">
+          <section class="workspace" aria-label="生活记录工作区">
           <section class="panel timeline-panel">
             <div class="panel-heading">
               <div>
@@ -1034,6 +1134,33 @@
               </div>
             </section>
           </aside>
+          </section>
+        </div>
+
+        <section class="view panel album-view" id="albumView" aria-label="相册">
+          <div class="album-head">
+            <p class="eyebrow">Album / RaccoonIngot</p>
+            <h2>浣熊元宝相册</h2>
+            <p>
+              先把 Camera Roll 里的两张照片放进来。这里之后可以继续收纳浣熊照片、熊文名词、城寨证据和那些值得恋眷的瞬间。
+            </p>
+          </div>
+          <div class="album-grid">
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-ingot-01.jpg" alt="浣熊元宝照片 1" />
+              <figcaption class="photo-caption">
+                <strong>浣熊元宝 01</strong>
+                <span>Camera Roll</span>
+              </figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-ingot-02.jpg" alt="浣熊元宝照片 2" />
+              <figcaption class="photo-caption">
+                <strong>浣熊元宝 02</strong>
+                <span>Camera Roll</span>
+              </figcaption>
+            </figure>
+          </div>
         </section>
       </main>
     </div>
@@ -1081,6 +1208,11 @@
       const timeline = document.querySelector("#timeline");
       const filterBar = document.querySelector("#filters");
       const comingSoonButtons = document.querySelectorAll("[data-coming-soon]");
+      const viewButtons = document.querySelectorAll("[data-view-target]");
+      const views = {
+        home: document.querySelector("#homeView"),
+        album: document.querySelector("#albumView"),
+      };
       const toast = document.querySelector("#toast");
       const searchWrap = document.querySelector("#searchWrap");
       const searchToggle = document.querySelector("#searchToggle");
@@ -1213,6 +1345,18 @@
         }, 1600);
       }
 
+      function switchView(target) {
+        Object.entries(views).forEach(([name, view]) => {
+          view.classList.toggle("active", name === target);
+        });
+
+        document.querySelectorAll(".nav-item").forEach((button) => {
+          button.classList.toggle("active", button.dataset.viewTarget === target);
+        });
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
       function updateStats(records) {
         const allTags = new Set(records.flatMap((record) => record.tags));
         const photos = records.reduce((sum, record) => sum + Number(record.photos || 0), 0);
@@ -1310,6 +1454,12 @@
 
           comingSoonButtons.forEach((button) => {
             button.addEventListener("click", () => showToast());
+          });
+
+          viewButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+              switchView(button.dataset.viewTarget);
+            });
           });
         })
         .catch(() => {
