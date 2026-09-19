@@ -117,17 +117,37 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        width: 100%;
         min-height: 42px;
         padding: 0 12px;
+        border: 0;
         border-radius: 8px;
+        background: transparent;
         color: #303238;
+        cursor: pointer;
         font-size: 15px;
+        text-align: left;
+        transition:
+          background 160ms ease,
+          color 160ms ease,
+          transform 160ms ease;
       }
 
       .nav-item.active {
         background: var(--accent-soft);
         color: var(--accent-strong);
         font-weight: 720;
+      }
+
+      .nav-item:hover,
+      .nav-item:focus-visible {
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        outline: none;
+      }
+
+      .nav-item:active {
+        transform: translateX(2px);
       }
 
       .nav-icon {
@@ -649,6 +669,35 @@
         font-size: 15px;
       }
 
+      .toast {
+        position: fixed;
+        right: 28px;
+        bottom: 28px;
+        z-index: 40;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 46px;
+        padding: 0 18px;
+        border: 1px solid var(--accent-line);
+        border-radius: 8px;
+        background: #292321;
+        color: #fff9f4;
+        box-shadow: 0 20px 60px rgba(25, 18, 16, 0.22);
+        font-weight: 720;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(14px);
+        transition:
+          opacity 180ms ease,
+          transform 180ms ease;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
       .side-stack {
         display: grid;
         gap: 18px;
@@ -794,6 +843,13 @@
         .detail-grid {
           grid-template-columns: 1fr;
         }
+
+        .toast {
+          right: 14px;
+          bottom: 14px;
+          left: 14px;
+          justify-content: center;
+        }
       }
     </style>
   </head>
@@ -809,32 +865,44 @@
         </div>
 
         <ul class="nav-group">
-          <li class="nav-item active">
+          <li>
+            <button class="nav-item active" type="button" data-coming-soon>
             <span class="nav-icon">⌂</span>
             今日
+            </button>
           </li>
-          <li class="nav-item">
+          <li>
+            <button class="nav-item" type="button" data-coming-soon>
             <span class="nav-icon">⌁</span>
             时间线
+            </button>
           </li>
-          <li class="nav-item">
+          <li>
+            <button class="nav-item" type="button" data-coming-soon>
             <span class="nav-icon">□</span>
             相册
+            </button>
           </li>
         </ul>
 
         <ul class="nav-group">
-          <li class="nav-item">
+          <li>
+            <button class="nav-item" type="button" data-coming-soon>
             <span class="nav-icon">#</span>
             标签
+            </button>
           </li>
-          <li class="nav-item">
+          <li>
+            <button class="nav-item" type="button" data-coming-soon>
             <span class="nav-icon">✎</span>
             片段
+            </button>
           </li>
-          <li class="nav-item">
+          <li>
+            <button class="nav-item" type="button" data-coming-soon>
             <span class="nav-icon">?</span>
             关于
+            </button>
           </li>
         </ul>
 
@@ -1007,9 +1075,13 @@
       </article>
     </div>
 
+    <div class="toast" id="toast" role="status" aria-live="polite">敬请期待！</div>
+
     <script>
       const timeline = document.querySelector("#timeline");
       const filterBar = document.querySelector("#filters");
+      const comingSoonButtons = document.querySelectorAll("[data-coming-soon]");
+      const toast = document.querySelector("#toast");
       const searchWrap = document.querySelector("#searchWrap");
       const searchToggle = document.querySelector("#searchToggle");
       const searchInput = document.querySelector("#searchInput");
@@ -1033,6 +1105,7 @@
       let activeFilter = "all";
       let activeSearch = "";
       let allRecords = [];
+      let toastTimer;
 
       const monthNames = [
         "一月",
@@ -1131,6 +1204,15 @@
         detailBackdrop.setAttribute("aria-hidden", "true");
       }
 
+      function showToast(message = "敬请期待！") {
+        toast.textContent = message;
+        toast.classList.add("show");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => {
+          toast.classList.remove("show");
+        }, 1600);
+      }
+
       function updateStats(records) {
         const allTags = new Set(records.flatMap((record) => record.tags));
         const photos = records.reduce((sum, record) => sum + Number(record.photos || 0), 0);
@@ -1224,6 +1306,10 @@
                 renderEntries(allRecords);
               }
             }
+          });
+
+          comingSoonButtons.forEach((button) => {
+            button.addEventListener("click", () => showToast());
           });
         })
         .catch(() => {
