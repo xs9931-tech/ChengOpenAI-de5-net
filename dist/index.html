@@ -148,6 +148,33 @@
         line-height: 1.7;
       }
 
+      .raccoon-peek {
+        position: absolute;
+        top: 112px;
+        right: -24px;
+        display: grid;
+        width: 64px;
+        height: 86px;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-right: 0;
+        border-radius: 32px 0 0 32px;
+        background: var(--surface);
+        box-shadow: 0 18px 42px rgba(42, 31, 29, 0.12);
+        font-size: 34px;
+      }
+
+      .raccoon-peek::after {
+        position: absolute;
+        bottom: 12px;
+        left: 18px;
+        width: 20px;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--accent);
+        content: "";
+      }
+
       .main {
         min-width: 0;
         padding: 34px clamp(22px, 4vw, 64px) 56px;
@@ -700,6 +727,10 @@
           position: static;
         }
 
+        .raccoon-peek {
+          display: none;
+        }
+
         .hero,
         .workspace {
           grid-template-columns: 1fr;
@@ -810,13 +841,14 @@
         <p class="side-note">
           记录不是为了把生活整理得完美，而是让一些微小、真实、会发光的东西有地方停留。
         </p>
+        <div class="raccoon-peek" aria-label="浣熊探出头来" title="浣熊元宝">🦝</div>
       </aside>
 
       <main class="main">
         <header class="topbar">
           <div class="date-chip">
             <strong>2026.09.19</strong>
-            <span>上海 / 夜间更新</span>
+            <span>燕归园 / 狈熊睡懒觉的时候更新</span>
           </div>
           <div class="actions">
             <button class="icon-button" aria-label="切换视图">⌘</button>
@@ -840,7 +872,7 @@
               <p class="eyebrow">Today / Human Tech Journal</p>
               <h1>请务必在大雪滂沱的圆月里，陪我燃起篝柴，影影绰绰地照亮，只属于我们的城寨。</h1>
               <p class="lead">
-                这里可以放今天最重要的一段话：一顿饭、一次散步、一页书、一张照片，或者一个没有被计划但值得保存的瞬间。
+                这里可以放浣熊元宝的：新熊文名词（如：奥拓姆屁眼，比尔费诗），浣熊照片，浣熊守则，或者一个未曾记录但值得恋眷的瞬间。
               </p>
             </div>
             <div class="daily-meta">
@@ -909,10 +941,10 @@
                 <h2>此刻</h2>
               </div>
               <ul class="now-list">
-                <li><span>正在读</span><strong>一本慢书</strong></li>
-                <li><span>常去地点</span><strong>河边小路</strong></li>
+                <li><span>正在读</span><strong>依恋障碍</strong></li>
+                <li><span>正要去</span><strong>吃抄手</strong></li>
                 <li><span>本周颜色</span><strong>#8A2B27</strong></li>
-                <li><span>想保留</span><strong>夜晚的风</strong></li>
+                <li><span>想保留</span><strong>狈熊的怀抱</strong></li>
               </ul>
             </section>
 
@@ -1122,6 +1154,25 @@
         monthHint.textContent = `本月还有 ${daysLeft} 天，保持轻量更新即可。`;
       }
 
+      function renderFilters(records) {
+        const primaryTags = [...new Set(records.map((record) => record.tags[0]).filter(Boolean))];
+        filterBar.innerHTML = [
+          '<button class="filter active" data-filter="all">全部</button>',
+          ...primaryTags.map((tag) => {
+            return `<button class="filter" data-filter="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`;
+          }),
+        ].join("");
+
+        filterBar.querySelectorAll(".filter").forEach((filter) => {
+          filter.addEventListener("click", () => {
+            activeFilter = filter.dataset.filter;
+            filterBar.querySelectorAll(".filter").forEach((item) => item.classList.remove("active"));
+            filter.classList.add("active");
+            renderEntries(allRecords);
+          });
+        });
+      }
+
       async function loadRecords() {
         const response = await fetch("./data/records.json", { cache: "no-store" });
         if (!response.ok) {
@@ -1182,21 +1233,3 @@
     </script>
   </body>
 </html>
-      function renderFilters(records) {
-        const primaryTags = [...new Set(records.map((record) => record.tags[0]).filter(Boolean))];
-        filterBar.innerHTML = [
-          '<button class="filter active" data-filter="all">全部</button>',
-          ...primaryTags.map((tag) => {
-            return `<button class="filter" data-filter="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`;
-          }),
-        ].join("");
-
-        filterBar.querySelectorAll(".filter").forEach((filter) => {
-          filter.addEventListener("click", () => {
-            activeFilter = filter.dataset.filter;
-            filterBar.querySelectorAll(".filter").forEach((item) => item.classList.remove("active"));
-            filter.classList.add("active");
-            renderEntries(allRecords);
-          });
-        });
-      }
