@@ -393,9 +393,39 @@
 
       .search-wrap.open .search-input {
         width: min(280px, 42vw);
-        padding: 0 14px;
+        padding: 0 42px 0 14px;
         border-color: var(--line);
         opacity: 1;
+      }
+
+      .search-clear {
+        position: absolute;
+        right: 43px;
+        display: none;
+        width: 34px;
+        height: 34px;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 20px;
+      }
+
+      .search-wrap.open.has-value .search-clear {
+        display: grid;
+        place-items: center;
+      }
+
+      .search-status {
+        min-height: 22px;
+        margin: -12px 0 22px;
+        color: var(--accent);
+        font-size: 14px;
+        font-weight: 650;
+      }
+
+      .search-status:empty {
+        display: none;
       }
 
       .icon-button,
@@ -1051,12 +1081,19 @@
 
         .search-wrap {
           width: 100%;
+          flex-wrap: wrap;
         }
 
         .search-wrap.open .search-input {
+          flex-basis: 100%;
           width: 100%;
           border-radius: 8px;
           margin: 0 0 8px;
+        }
+
+        .search-clear {
+          right: 8px;
+          top: 3px;
         }
 
         .date-chip,
@@ -1216,10 +1253,11 @@
                 class="search-input"
                 id="searchInput"
                 type="search"
-                placeholder="搜索标题、内容、标签"
+                placeholder="搜索标题、正文、地点或标签"
                 aria-label="搜索记录"
               />
-              <button class="icon-button" id="searchToggle" aria-label="搜索记录">⌕</button>
+              <button class="search-clear" id="searchClear" type="button" aria-label="清空搜索">×</button>
+              <button class="icon-button" id="searchToggle" type="button" aria-label="搜索记录" aria-expanded="false">⌕</button>
             </div>
             <button class="primary-button">＋ 新记录</button>
           </div>
@@ -1287,6 +1325,8 @@
                 <p class="quiet">按时间排列，可以用标签快速筛选。</p>
               </div>
             </div>
+
+            <p class="search-status" id="searchStatus" aria-live="polite"></p>
 
             <div class="filters" id="filters" aria-label="记录筛选">
               <button class="filter active" data-filter="all">全部</button>
@@ -1458,6 +1498,8 @@
       const searchWrap = document.querySelector("#searchWrap");
       const searchToggle = document.querySelector("#searchToggle");
       const searchInput = document.querySelector("#searchInput");
+      const searchClear = document.querySelector("#searchClear");
+      const searchStatus = document.querySelector("#searchStatus");
       const recordCount = document.querySelector("#recordCount");
       const photoCount = document.querySelector("#photoCount");
       const tagCount = document.querySelector("#tagCount");
@@ -1597,10 +1639,14 @@
 
       function renderEntries(records) {
         const visibleRecords = getVisibleRecords(records);
+        updateSearchStatus(visibleRecords.length);
 
         if (!visibleRecords.length) {
-          timeline.innerHTML =
-            '<article class="entry"><span class="entry-date">No records</span><h3>这里还没有记录</h3><p>换一个标签，或者添加一条新的生活片段。</p></article>';
+          const emptyTitle = activeSearch ? `没有找到“${escapeHtml(activeSearch)}”` : "这里还没有记录";
+          const emptyHint = activeSearch
+            ? "试试更短的关键词，也可以搜索地点、心情或标签。"
+            : "换一个标签，或者添加一条新的生活片段。";
+          timeline.innerHTML = `<article class="entry"><span class="entry-date">No records</span><h3>${emptyTitle}</h3><p>${emptyHint}</p></article>`;
           return;
         }
 
@@ -1626,7 +1672,40 @@
               openDetail(record);
             }
           });
+          });
+      }
+
+      function updateSearchStatus(resultCount) {
+        if (!activeSearch) {
+          searchStatus.textContent = "";
+          return;
+        }
+
+        searchStatus.textContent = `找到 ${resultCount} 条关于“${activeSearch}”的记录`;
+      }
+
+      function resetSearch() {
+        searchInput.value = "";
+        activeSearch = "";
+        searchWrap.classList.remove("has-value");
+        renderEntries(allRecords);
+      }
+
+      function openSearch() {
+        switchView("home");
+        activeFilter = "all";
+        filterBar.querySelectorAll(".filter").forEach((item) => {
+          item.classList.toggle("active", item.dataset.filter === "all");
         });
+        searchWrap.classList.add("open");
+        searchToggle.setAttribute("aria-expanded", "true");
+        searchInput.focus();
+      }
+
+      function closeSearch() {
+        searchWrap.classList.remove("open", "has-value");
+        searchToggle.setAttribute("aria-expanded", "false");
+        resetSearch();
       }
 
       function openDetail(record) {
@@ -1731,19 +1810,29 @@
           renderEntries(records);
 
           searchToggle.addEventListener("click", () => {
-            searchWrap.classList.toggle("open");
             if (searchWrap.classList.contains("open")) {
-              searchInput.focus();
+              closeSearch();
             } else {
-              searchInput.value = "";
-              activeSearch = "";
-              renderEntries(allRecords);
+              openSearch();
             }
           });
 
           searchInput.addEventListener("input", () => {
+            const wasEmpty = !activeSearch;
             activeSearch = searchInput.value.trim();
+            searchWrap.classList.toggle("has-value", Boolean(activeSearch));
             renderEntries(allRecords);
+            if (wasEmpty && activeSearch) {
+              document.querySelector(".timeline-panel").scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          });
+
+          searchClear.addEventListener("click", () => {
+            resetSearch();
+            searchInput.focus();
           });
 
           detailClose.addEventListener("click", closeDetail);
@@ -1758,10 +1847,7 @@
               if (detailBackdrop.classList.contains("open")) {
                 closeDetail();
               } else if (searchWrap.classList.contains("open")) {
-                searchWrap.classList.remove("open");
-                searchInput.value = "";
-                activeSearch = "";
-                renderEntries(allRecords);
+                closeSearch();
               }
             }
           });
@@ -1772,7 +1858,11 @@
 
           viewButtons.forEach((button) => {
             button.addEventListener("click", () => {
-              switchView(button.dataset.viewTarget);
+              const target = button.dataset.viewTarget;
+              if (target !== "home" && searchWrap.classList.contains("open")) {
+                closeSearch();
+              }
+              switchView(target);
             });
           });
         })
