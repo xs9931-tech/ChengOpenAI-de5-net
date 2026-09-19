@@ -51,6 +51,141 @@
         letter-spacing: 0;
       }
 
+      body.gate-open {
+        overflow: hidden;
+      }
+
+      .entry-gate {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          linear-gradient(90deg, rgba(138, 43, 39, 0.045) 1px, transparent 1px),
+          linear-gradient(0deg, rgba(46, 89, 100, 0.045) 1px, transparent 1px),
+          rgba(251, 250, 248, 0.98);
+        background-size: 40px 40px;
+        transition: opacity 240ms ease, visibility 240ms ease;
+      }
+
+      .entry-gate.closing {
+        visibility: hidden;
+        opacity: 0;
+      }
+
+      .gate-panel {
+        width: min(560px, 100%);
+        padding: clamp(30px, 6vw, 54px);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 32px 100px rgba(42, 31, 29, 0.13);
+      }
+
+      .gate-step[hidden] {
+        display: none;
+      }
+
+      .gate-kicker {
+        margin: 0 0 20px;
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 750;
+        text-transform: uppercase;
+      }
+
+      .gate-step h1 {
+        margin: 0 0 28px;
+        font-family: Georgia, "Times New Roman", "Microsoft YaHei", serif;
+        font-size: clamp(42px, 9vw, 72px);
+        font-weight: 560;
+        line-height: 1.08;
+      }
+
+      .identity-form {
+        display: flex;
+        gap: 10px;
+      }
+
+      .identity-input {
+        min-width: 0;
+        flex: 1;
+        height: 50px;
+        padding: 0 16px;
+        border: 1px solid var(--accent-line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--ink);
+        outline: none;
+      }
+
+      .identity-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(138, 43, 39, 0.1);
+      }
+
+      .gate-submit {
+        min-height: 50px;
+        padding: 0 20px;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        background: var(--accent);
+        color: #fffaf8;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .password-hint {
+        margin: -12px 0 24px;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .password-boxes {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .password-box {
+        width: 100%;
+        aspect-ratio: 1;
+        border: 1px solid var(--accent-line);
+        border-radius: 8px;
+        background: var(--surface-soft);
+        color: var(--accent-strong);
+        font-size: 28px;
+        font-weight: 750;
+        text-align: center;
+        outline: none;
+      }
+
+      .password-box:focus {
+        border-color: var(--accent);
+        background: var(--surface);
+        box-shadow: 0 0 0 3px rgba(138, 43, 39, 0.1);
+      }
+
+      .password-boxes.shake {
+        animation: gate-shake 240ms ease;
+      }
+
+      .gate-error {
+        min-height: 24px;
+        margin: 0 0 14px;
+        color: var(--accent);
+        font-size: 14px;
+      }
+
+      @keyframes gate-shake {
+        25% { transform: translateX(-7px); }
+        50% { transform: translateX(7px); }
+        75% { transform: translateX(-4px); }
+      }
+
       button,
       input {
         font: inherit;
@@ -521,6 +656,7 @@
       }
 
       .photo-card {
+        margin: 0;
         overflow: hidden;
         border: 1px solid var(--line);
         border-radius: 8px;
@@ -533,6 +669,10 @@
         width: 100%;
         aspect-ratio: 4 / 3;
         object-fit: cover;
+      }
+
+      .photo-card time {
+        white-space: nowrap;
       }
 
       .photo-caption {
@@ -548,6 +688,7 @@
       .photo-caption strong {
         color: var(--ink);
         font-size: 16px;
+        white-space: nowrap;
       }
 
       .timeline-panel {
@@ -878,6 +1019,26 @@
       }
 
       @media (max-width: 720px) {
+        .entry-gate {
+          padding: 14px;
+        }
+
+        .gate-panel {
+          padding: 28px 20px;
+        }
+
+        .identity-form {
+          display: grid;
+        }
+
+        .password-boxes {
+          gap: 6px;
+        }
+
+        .password-box {
+          font-size: 22px;
+        }
+
         .main {
           padding: 22px 14px 40px;
         }
@@ -952,8 +1113,39 @@
       }
     </style>
   </head>
-  <body>
-    <div class="shell">
+  <body class="gate-open">
+    <div class="entry-gate" id="entryGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+      <section class="gate-panel">
+        <div class="gate-step" id="identityStep">
+          <p class="gate-kicker">Cheng + RaccoonIngot</p>
+          <h1 id="gateTitle">你是谁？</h1>
+          <form class="identity-form" id="identityForm">
+            <input class="identity-input" id="identityInput" type="text" autocomplete="name" placeholder="在这里留下名字" aria-label="你是谁" autofocus />
+            <button class="gate-submit" type="submit">继续</button>
+          </form>
+        </div>
+
+        <div class="gate-step" id="passwordStep" hidden>
+          <p class="gate-kicker">One more thing</p>
+          <h1>城寨暗号</h1>
+          <p class="password-hint">请输入六位密码。</p>
+          <form id="passwordForm">
+            <div class="password-boxes" id="passwordBoxes" aria-label="六位密码">
+              <input class="password-box" type="password" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="密码第 1 位" />
+              <input class="password-box" type="password" inputmode="numeric" maxlength="1" aria-label="密码第 2 位" />
+              <input class="password-box" type="password" inputmode="numeric" maxlength="1" aria-label="密码第 3 位" />
+              <input class="password-box" type="password" inputmode="numeric" maxlength="1" aria-label="密码第 4 位" />
+              <input class="password-box" type="password" inputmode="numeric" maxlength="1" aria-label="密码第 5 位" />
+              <input class="password-box" type="password" inputmode="numeric" maxlength="1" aria-label="密码第 6 位" />
+            </div>
+            <p class="gate-error" id="gateError" role="status" aria-live="polite"></p>
+            <button class="gate-submit" type="submit">进入城寨</button>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <div class="shell" id="siteShell" aria-hidden="true">
       <aside class="sidebar" aria-label="站点导航">
         <div class="brand">
           <div class="brand-mark">C</div>
@@ -1142,22 +1334,62 @@
             <p class="eyebrow">Album / RaccoonIngot</p>
             <h2>浣熊元宝相册</h2>
             <p>
-              先把 Camera Roll 里的两张照片放进来。这里之后可以继续收纳浣熊照片、熊文名词、城寨证据和那些值得恋眷的瞬间。
+              十二张有时间的照片，收纳浣熊照片、熊文名词、城寨证据和那些值得恋眷的瞬间。
             </p>
           </div>
           <div class="album-grid">
             <figure class="photo-card">
-              <img src="./images/album/raccoon-ingot-01.jpg" alt="浣熊元宝照片 1" />
+              <img src="./images/album/raccoon-face-01.jpg" alt="浣熊元宝照片 1" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 01</strong><time datetime="2026-09-18T20:21:31">2026.09.18 20:21</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-face-02.jpg" alt="浣熊元宝照片 2" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 02</strong><time datetime="2026-09-18T20:17:34">2026.09.18 20:17</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-face-03.jpg" alt="浣熊元宝照片 3" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 03</strong><time datetime="2026-09-18T20:01:24">2026.09.18 20:01</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-face-04.jpg" alt="浣熊元宝照片 4" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 04</strong><time datetime="2026-09-18T18:14:28">2026.09.18 18:14</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-face-05.jpg" alt="浣熊元宝照片 5" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 05</strong><time datetime="2026-09-18T15:36:04">2026.09.18 15:36</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-face-06.jpg" alt="浣熊元宝照片 6" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 06</strong><time datetime="2026-09-17T18:25:40">2026.09.17 18:25</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-face-07.jpg" alt="浣熊元宝照片 7" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 07</strong><time datetime="2026-09-16T15:19:43">2026.09.16 15:19</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-face-08.jpg" alt="浣熊元宝照片 8" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 08</strong><time datetime="2026-09-16T15:19:38">2026.09.16 15:19</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-face-09.jpg" alt="浣熊元宝照片 9" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 09</strong><time datetime="2026-09-16T15:19:00">2026.09.16 15:19</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-face-10.jpg" alt="浣熊元宝照片 10" loading="lazy" decoding="async" />
+              <figcaption class="photo-caption"><strong>浣熊元宝 10</strong><time datetime="2026-09-15T15:14:39">2026.09.15 15:14</time></figcaption>
+            </figure>
+            <figure class="photo-card">
+              <img src="./images/album/raccoon-ingot-01.jpg" alt="浣熊元宝照片 11" loading="lazy" decoding="async" />
               <figcaption class="photo-caption">
-                <strong>浣熊元宝 01</strong>
-                <span>Camera Roll</span>
+                <strong>浣熊元宝 11</strong>
+                <time datetime="2026-08-03T11:09:19">2026.08.03 11:09</time>
               </figcaption>
             </figure>
             <figure class="photo-card">
-              <img src="./images/album/raccoon-ingot-02.jpg" alt="浣熊元宝照片 2" />
+              <img src="./images/album/raccoon-ingot-02.jpg" alt="浣熊元宝照片 12" loading="lazy" decoding="async" />
               <figcaption class="photo-caption">
-                <strong>浣熊元宝 02</strong>
-                <span>Camera Roll</span>
+                <strong>浣熊元宝 12</strong>
+                <time datetime="2026-08-03T11:09:14">2026.08.03 11:09</time>
               </figcaption>
             </figure>
           </div>
@@ -1205,6 +1437,15 @@
     <div class="toast" id="toast" role="status" aria-live="polite">敬请期待！</div>
 
     <script>
+      const entryGate = document.querySelector("#entryGate");
+      const siteShell = document.querySelector("#siteShell");
+      const identityStep = document.querySelector("#identityStep");
+      const identityForm = document.querySelector("#identityForm");
+      const passwordStep = document.querySelector("#passwordStep");
+      const passwordForm = document.querySelector("#passwordForm");
+      const passwordBoxes = document.querySelector("#passwordBoxes");
+      const passwordInputs = [...document.querySelectorAll(".password-box")];
+      const gateError = document.querySelector("#gateError");
       const timeline = document.querySelector("#timeline");
       const filterBar = document.querySelector("#filters");
       const comingSoonButtons = document.querySelectorAll("[data-coming-soon]");
@@ -1238,6 +1479,78 @@
       let activeSearch = "";
       let allRecords = [];
       let toastTimer;
+
+      function unlockSite() {
+        entryGate.classList.add("closing");
+        siteShell.removeAttribute("aria-hidden");
+        document.body.classList.remove("gate-open");
+        window.setTimeout(() => entryGate.remove(), 260);
+      }
+
+      function checkPassword() {
+        const password = passwordInputs.map((input) => input.value).join("");
+        if (password.length < 6) {
+          return;
+        }
+
+        if (password === "991118") {
+          unlockSite();
+          return;
+        }
+
+        gateError.textContent = "暗号不对，再想想。";
+        passwordBoxes.classList.remove("shake");
+        void passwordBoxes.offsetWidth;
+        passwordBoxes.classList.add("shake");
+        passwordInputs.forEach((input) => {
+          input.value = "";
+        });
+        passwordInputs[0].focus();
+      }
+
+      identityForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        identityStep.hidden = true;
+        passwordStep.hidden = false;
+        passwordInputs[0].focus();
+      });
+
+      passwordForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        checkPassword();
+      });
+
+      passwordInputs.forEach((input, index) => {
+        input.addEventListener("input", () => {
+          input.value = input.value.replace(/\D/g, "").slice(-1);
+          gateError.textContent = "";
+          if (input.value && index < passwordInputs.length - 1) {
+            passwordInputs[index + 1].focus();
+          }
+          if (passwordInputs.every((item) => item.value)) {
+            checkPassword();
+          }
+        });
+
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Backspace" && !input.value && index > 0) {
+            passwordInputs[index - 1].focus();
+          }
+        });
+
+        input.addEventListener("paste", (event) => {
+          const digits = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+          if (!digits) return;
+          event.preventDefault();
+          digits.split("").forEach((digit, digitIndex) => {
+            if (passwordInputs[digitIndex]) {
+              passwordInputs[digitIndex].value = digit;
+            }
+          });
+          passwordInputs[Math.min(digits.length, 6) - 1].focus();
+          if (digits.length === 6) checkPassword();
+        });
+      });
 
       const monthNames = [
         "一月",
@@ -1360,6 +1673,7 @@
       function updateStats(records) {
         const allTags = new Set(records.flatMap((record) => record.tags));
         const photos = records.reduce((sum, record) => sum + Number(record.photos || 0), 0);
+        const albumPhotos = document.querySelectorAll(".photo-card").length;
         const latest = records[0];
         const latestDate = latest ? new Date(`${latest.date}T12:00:00`) : new Date();
         const month = latestDate.getMonth();
@@ -1372,7 +1686,7 @@
         }).length;
 
         recordCount.textContent = String(monthRecordTotal);
-        photoCount.textContent = String(photos);
+        photoCount.textContent = String(Math.max(photos, albumPhotos));
         tagCount.textContent = String(allTags.size);
         monthTitle.textContent = `${monthNames[month]}记录`;
         lastUpdated.textContent = latest ? `最后更新 ${latest.date}` : "等待第一条记录";
